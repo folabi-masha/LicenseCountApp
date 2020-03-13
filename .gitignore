@@ -1,4 +1,5 @@
-venv
+/venv
+/__pycache__
 lclogo.png
 lcicon.icns
 setup.py
