@@ -151,6 +151,11 @@ class AddSoftwareWindow(QtWidgets.QWidget):
             deleted_msgbox.setText(self.combo.currentText() + " has been deleted")
             deleted_msgbox.setStandardButtons(QMessageBox.Ok)
             deleted_msgbox.exec()
+            text = self.combo.currentIndex()
+            self.combo.removeItem(text)
+
+
+
 
         else:
             pass
@@ -282,6 +287,7 @@ class DeleteUserWindow(QtWidgets.QWidget):
 
         # self.combo1 = QComboBox(self)
 
+
         # combobox = MenuWindow().combo
 
         self.default_allowance = db.show_licenses(self.software)
@@ -323,6 +329,9 @@ class DeleteUserWindow(QtWidgets.QWidget):
         confirm_msgbox.setText(self.combo2.currentText() + " has been deleted")
         confirm_msgbox.setStandardButtons(QMessageBox.Ok)
         confirm_msgbox.exec()
+        text = self.combo2.currentIndex()
+        self.combo2.removeItem(text)
+
 
     def quit(self):
         self.destroy()
