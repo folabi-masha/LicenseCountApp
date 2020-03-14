@@ -7,17 +7,17 @@ With this License Tracker application, IT support teams will be able to keep tra
 
 ### External Module
 
-There is only one external module that needs to be installed and that is pymsgbox.
+There is only one external module that needs to be installed and that is PyQt5.
 
 ```
-pip install pymsgbox
+pip install PyQt5
 ```
 
 ### Installing
 
-Navigate to the directory to which the python files after the module install and you can run the program.
+Navigate to the location of the python files and you can run the program.
 
 ```
-python licensecount.py
+python main.py
 ```
 
