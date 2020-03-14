@@ -1,6 +1,8 @@
 /venv
 /__pycache__
 /.idea
+/build
+/dist
 lclogo.png
 lcicon.icns
 setup.py
