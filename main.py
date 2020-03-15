@@ -9,6 +9,7 @@ db = Database()
 db.create_database()
 db.load()
 
+
 class MenuWindow(QtWidgets.QWidget):
     def __init__(self):
         self.user_window = AddUserWindow()
@@ -37,10 +38,6 @@ class MenuWindow(QtWidgets.QWidget):
         self.go_to_add_user_button.clicked.connect(self.go_to_add_user)
         layout.addWidget(self.go_to_add_user_button)
 
-        self.refresh_button = QtWidgets.QPushButton(self)
-        self.refresh_button.setText("Refresh")
-        layout.addWidget(self.refresh_button)
-
         self.quit_button = QtWidgets.QPushButton(self)
         self.quit_button.setText("Quit")
         self.quit_button.clicked.connect(self.quit)
@@ -48,10 +45,6 @@ class MenuWindow(QtWidgets.QWidget):
 
         self.setLayout(layout)
         self.show()
-
-    def current_software(self):
-        return
-
 
     def go_to_add_software(self):
         self.software_window = AddSoftwareWindow()
@@ -68,7 +61,6 @@ class AddSoftwareWindow(QtWidgets.QWidget):
         super(AddSoftwareWindow, self).__init__()
 
         self.setWindowTitle("Add/Delete Software")
-
 
         self.update()
 
@@ -133,7 +125,8 @@ class AddSoftwareWindow(QtWidgets.QWidget):
         else:
             delete_msgbox = QMessageBox()
             delete_msgbox.setWindowTitle("Delete Software")
-            delete_msgbox.setText("Are you sure you want to delete " + self.software_combobox.currentText() + "? (All users will be deleted.)")
+            delete_msgbox.setText(
+                "Are you sure you want to delete " + self.software_combobox.currentText() + "? (All users will be deleted.)")
             delete_msgbox.setIcon(QMessageBox.Warning)
             delete_msgbox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
             delete_msgbox.setDefaultButton(QMessageBox.Yes)
@@ -162,6 +155,13 @@ class AddSoftwareWindow(QtWidgets.QWidget):
             error_msgbox.setText("Please enter a software")
             error_msgbox.setStandardButtons(QMessageBox.Ok)
             error_msgbox.exec()
+        elif self.software_name_input.text() in db.show_software():
+            error_msgbox = QMessageBox()
+            error_msgbox.setIcon(QMessageBox.Information)
+            error_msgbox.setWindowTitle("Add Software")
+            error_msgbox.setText("Duplicate Software Added")
+            error_msgbox.setStandardButtons(QMessageBox.Ok)
+            error_msgbox.exec()
         else:
             db.add_software(self.software_name_input.text(), self.license_allowance_input.text())
             confirm_msgbox = QMessageBox()
@@ -175,7 +175,6 @@ class AddSoftwareWindow(QtWidgets.QWidget):
 
     def quit(self):
         self.destroy()
-
 
 
 class AddUserWindow(QtWidgets.QWidget):
@@ -226,18 +225,24 @@ class AddUserWindow(QtWidgets.QWidget):
         self.show()
 
     def software_users(self):
-        self.software_window = DeleteUserWindow(self.software_combobox.currentText())
-
-    def delete_software(self):
-        db.delete_software(self.software_combobox.currentText())
-
-
-    def add_software(self):
-        db.add_software(self.software_name_input.text(), self.license_allowance_input.text())
+        if self.software_combobox.currentText() == "":
+            error_msgbox = QMessageBox()
+            error_msgbox.setIcon(QMessageBox.Information)
+            error_msgbox.setWindowTitle("Delete User")
+            error_msgbox.setText("No software available")
+            error_msgbox.setStandardButtons(QMessageBox.Ok)
+            error_msgbox.exec()
+        else:
+            self.software_window = DeleteUserWindow(self.software_combobox.currentText())
 
     def submit(self):
-        if self.software_combobox.currentText() == "Select Software":
-            pass
+        if self.software_combobox.currentText() == "" and self.employee_name_input != "":
+            error_msgbox = QMessageBox()
+            error_msgbox.setIcon(QMessageBox.Information)
+            error_msgbox.setWindowTitle("Add User")
+            error_msgbox.setText("No Software available to add users to")
+            error_msgbox.setStandardButtons(QMessageBox.Ok)
+            error_msgbox.exec()
         elif self.employee_name_input.text() == "":
             error_msgbox = QMessageBox()
             error_msgbox.setIcon(QMessageBox.Information)
@@ -261,16 +266,16 @@ class AddUserWindow(QtWidgets.QWidget):
             user_added_msgbox.setStandardButtons(QMessageBox.Ok)
             user_added_msgbox.exec()
 
-
     def quit(self):
         self.destroy()
+
 
 class DeleteUserWindow(QtWidgets.QWidget):
     def __init__(self, software):
         super(DeleteUserWindow, self).__init__()
 
         self.setWindowTitle("Delete User")
-        #
+
         self.software = software
 
         layout = QtWidgets.QGridLayout()
@@ -285,7 +290,7 @@ class DeleteUserWindow(QtWidgets.QWidget):
         self.license_allowance_label.setText("Licenses Left")
         self.license_allowance_label.setFont(QFont("Arial", 14, QFont.Bold))
         layout.addWidget(self.license_allowance_label)
-        #
+
         self.default_allowance = db.show_licenses(self.software)
         self.active_allowance = db.remaining_licenses(self.software)
         self.remaining_licenses = self.default_allowance - self.active_allowance
@@ -318,7 +323,6 @@ class DeleteUserWindow(QtWidgets.QWidget):
         self.setLayout(layout)
         self.show()
 
-
     def delete_user_msgbox(self):
         if self.user_combobox.currentText() == "":
             error_msgbox = QMessageBox()
@@ -337,7 +341,6 @@ class DeleteUserWindow(QtWidgets.QWidget):
             delete_msgbox.setDefaultButton(QMessageBox.Yes)
             delete_msgbox.buttonClicked.connect(self.delete_user)
             delete_msgbox.exec_()
-
 
     def delete_user(self, i):
         if i.text() == "&Yes":
@@ -360,11 +363,3 @@ class DeleteUserWindow(QtWidgets.QWidget):
 app = QApplication(sys.argv)
 my_gui = MenuWindow()
 sys.exit(app.exec())
-# if self.software_combobox.currentText() == "":
-#     error_msgbox = QMessageBox()
-#     error_msgbox.setIcon(QMessageBox.Information)
-#     error_msgbox.setWindowTitle("Delete User")
-#     error_msgbox.setText("No software available")
-#     error_msgbox.setStandardButtons(QMessageBox.Ok)
-#     error_msgbox.exec()
-# else:
