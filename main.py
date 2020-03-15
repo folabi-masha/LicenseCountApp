@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QApplication, QMainWindow, QComboBox, QLabel, QMessageBox
+from PyQt5.QtWidgets import QApplication, QComboBox, QLabel, QMessageBox
 from PyQt5.QtGui import *
 import sys
 
@@ -7,8 +7,10 @@ from database import Database
 
 db = Database()
 
+
 class MenuWindow(QtWidgets.QWidget):
     def __init__(self):
+        self.user_window = AddUserWindow()
         db.create_database()
         db.load()
         super(MenuWindow, self).__init__()
@@ -23,9 +25,6 @@ class MenuWindow(QtWidgets.QWidget):
         layout = QtWidgets.QGridLayout()
 
         layout.addWidget(self.label)
-
-
-
 
         self.go_to_add_software_button = QtWidgets.QPushButton(self)
         self.go_to_add_software_button.setText("Add/Delete Software")
@@ -55,15 +54,9 @@ class MenuWindow(QtWidgets.QWidget):
 
     def go_to_add_software(self):
         self.software_window = AddSoftwareWindow()
-        # self.software_window.initUI()
 
     def go_to_add_user(self):
         self.user_window = AddUserWindow()
-
-
-    def refresh(self):
-        print(self.combo.currentText())
-
 
     def quit(self):
         self.destroy(sys.exit())
@@ -76,9 +69,8 @@ class AddSoftwareWindow(QtWidgets.QWidget):
         self.update()
 
         self.software_choices = db.show_software()
-        self.combo = QComboBox(self)
-        self.combo.addItems(self.software_choices)
-        self.qlabel = QLabel(self)
+        self.software_comboboxsoftware_combobox = QComboBox(self)
+        self.software_combobox.addItems(self.software_choices)
 
         layout = QtWidgets.QGridLayout()
 
@@ -87,7 +79,7 @@ class AddSoftwareWindow(QtWidgets.QWidget):
         self.software_delete_label.setFont(QFont("Arial", 14, QFont.Bold))
         layout.addWidget(self.software_delete_label)
 
-        layout.addWidget(self.combo)
+        layout.addWidget(self.software_combobox)
 
         self.delete_button = QtWidgets.QPushButton(self)
         self.delete_button.setText("Delete")
@@ -127,7 +119,7 @@ class AddSoftwareWindow(QtWidgets.QWidget):
         self.show()
 
     def delete_software_popups(self):
-        if self.combo.currentText() == "Select Software":
+        if self.software_combobox.currentText() == "Select Software":
             error_msgbox = QMessageBox()
             error_msgbox.setWindowTitle("Delete Software")
             error_msgbox.setText("Please choose a software")
@@ -136,7 +128,7 @@ class AddSoftwareWindow(QtWidgets.QWidget):
         else:
             delete_msgbox = QMessageBox()
             delete_msgbox.setWindowTitle("Delete Software")
-            delete_msgbox.setText("Are you sure you want to delete " + self.combo.currentText() + "? (All users will be deleted.)")
+            delete_msgbox.setText("Are you sure you want to delete " + self.software_combobox.currentText() + "? (All users will be deleted.)")
             delete_msgbox.setIcon(QMessageBox.Warning)
             delete_msgbox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
             delete_msgbox.setDefaultButton(QMessageBox.Yes)
@@ -145,18 +137,14 @@ class AddSoftwareWindow(QtWidgets.QWidget):
 
     def delete_software(self, i):
         if i.text() == "&Yes":
-            db.delete_software(self.combo.currentText())
+            db.delete_software(self.software_combobox.currentText())
             deleted_msgbox = QMessageBox()
             deleted_msgbox.setWindowTitle("Delete Software")
-            deleted_msgbox.setText(self.combo.currentText() + " has been deleted")
+            deleted_msgbox.setText(self.software_combobox.currentText() + " has been deleted")
             deleted_msgbox.setStandardButtons(QMessageBox.Ok)
             deleted_msgbox.exec()
-            text = self.combo.currentIndex()
-            self.combo.removeItem(text)
-
-
-
-
+            text = self.software_combobox.currentIndex()
+            self.software_combobox.removeItem(text)
         else:
             pass
 
@@ -179,33 +167,30 @@ class AddSoftwareWindow(QtWidgets.QWidget):
         self.destroy()
 
 
+
 class AddUserWindow(QtWidgets.QWidget):
     def __init__(self):
         super(AddUserWindow, self).__init__()
 
         self.software_choices = db.show_software()
-        self.combo = QComboBox(self)
-        self.combo.addItems(self.software_choices)
+        self.software_combobox = QComboBox(self)
+        self.software_combobox.addItems(self.software_choices)
 
-
-
-        self.qlabel = QLabel(self)
         self.current = MenuWindow.current_software(self)
 
         layout = QtWidgets.QGridLayout()
 
-        self.software_name_label = QtWidgets.QLabel(self)
-        self.software_name_label.setText("Select Software")
-        self.software_name_label.setFont(QFont("Arial", 14, QFont.Bold))
-        layout.addWidget(self.software_name_label)
+        self.select_software_label = QtWidgets.QLabel(self)
+        self.select_software_label.setText("Select Software")
+        self.select_software_label.setFont(QFont("Arial", 14, QFont.Bold))
+        layout.addWidget(self.select_software_label)
 
-        # Dropdown Menu
-        layout.addWidget(self.combo)
+        layout.addWidget(self.software_combobox)
 
-        self.go_button = QtWidgets.QPushButton(self)
-        self.go_button.setText("Delete A User")
-        self.go_button.clicked.connect(self.software_users)
-        layout.addWidget(self.go_button)
+        self.delete_user_button = QtWidgets.QPushButton(self)
+        self.delete_user_button.setText("Delete A User")
+        self.delete_user_button.clicked.connect(self.software_users)
+        layout.addWidget(self.delete_user_button)
 
         self.employee_name_label = QtWidgets.QLabel(self)
         self.employee_name_label.setText("Employee Name")
@@ -220,27 +205,26 @@ class AddUserWindow(QtWidgets.QWidget):
         self.submit_user_button.clicked.connect(self.submit)
         layout.addWidget(self.submit_user_button)
 
-        self.go_to_add_software_button = QtWidgets.QPushButton(self)
-        self.go_to_add_software_button.setText("Go Back")
-        self.go_to_add_software_button.clicked.connect(self.quit)
-        layout.addWidget(self.go_to_add_software_button)
+        self.go_back_button = QtWidgets.QPushButton(self)
+        self.go_back_button.setText("Go Back")
+        self.go_back_button.clicked.connect(self.quit)
+        layout.addWidget(self.go_back_button)
 
         self.setLayout(layout)
         self.show()
 
     def software_users(self):
-        self.window = DeleteUserWindow(self.combo.currentText())
+        DeleteUserWindow(self.software_combobox.currentText())
 
     def delete_software(self):
-        db.delete_software(self.combo.currentText())
+        db.delete_software(self.software_combobox.currentText())
 
 
     def add_software(self):
         db.add_software(self.software_name_input.text(), self.license_allowance_input.text())
-        # print(self.software_name_input.text(), self.license_allowance_input.text())
 
     def submit(self):
-        if self.combo.currentText() == "Select Software":
+        if self.software_combobox.currentText() == "Select Software":
             pass
         elif self.employee_name_input.text() == "":
             error_msgbox = QMessageBox()
@@ -248,14 +232,14 @@ class AddUserWindow(QtWidgets.QWidget):
             error_msgbox.setText("Please enter a name")
             error_msgbox.setStandardButtons(QMessageBox.Ok)
             error_msgbox.exec()
-        elif self.employee_name_input.text() in db.show_users(self.combo.currentText()):
+        elif self.employee_name_input.text() in db.show_users(self.software_combobox.currentText()):
             duplicate_msgbox = QMessageBox()
             duplicate_msgbox.setWindowTitle("Add User")
             duplicate_msgbox.setText("Duplicate Name Entered!")
             duplicate_msgbox.setStandardButtons(QMessageBox.Ok)
             duplicate_msgbox.exec()
         else:
-            db.add_user(self.combo.currentText(), self.employee_name_input.text())
+            db.add_user(self.software_combobox.currentText(), self.employee_name_input.text())
             user_added_msgbox = QMessageBox()
             user_added_msgbox.setWindowTitle("Add User")
             user_added_msgbox.setText("User Added")
@@ -285,15 +269,10 @@ class DeleteUserWindow(QtWidgets.QWidget):
         self.license_allowance_label.setFont(QFont("Arial", 14, QFont.Bold))
         layout.addWidget(self.license_allowance_label)
 
-        # self.combo1 = QComboBox(self)
-
-
-        # combobox = MenuWindow().combo
-
         self.default_allowance = db.show_licenses(self.software)
         self.active_allowance = db.remaining_licenses(self.software)
         self.remaining_licenses = self.default_allowance - self.active_allowance
-        #
+
         self.license_left_label = QtWidgets.QLabel(self)
         self.license_left_label.setText(str(self.remaining_licenses))
         self.license_left_label.setAlignment(QtCore.Qt.AlignCenter)
@@ -305,9 +284,9 @@ class DeleteUserWindow(QtWidgets.QWidget):
         layout.addWidget(self.delete_user_label)
 
         self.name_choices = db.show_users(self.software)
-        self.combo2 = QComboBox(self)
-        self.combo2.addItems(self.name_choices)
-        layout.addWidget(self.combo2)
+        self.user_combobox = QComboBox(self)
+        self.user_combobox.addItems(self.name_choices)
+        layout.addWidget(self.user_combobox)
 
         self.delete_button = QtWidgets.QPushButton(self)
         self.delete_button.setText("Delete")
@@ -323,14 +302,14 @@ class DeleteUserWindow(QtWidgets.QWidget):
         self.show()
 
     def delete_user(self):
-        db.delete_user(self.combo2.currentText())
+        db.delete_user(self.user_combobox.currentText())
         confirm_msgbox = QMessageBox()
         confirm_msgbox.setWindowTitle("Delete User")
-        confirm_msgbox.setText(self.combo2.currentText() + " has been deleted")
+        confirm_msgbox.setText(self.user_combobox.currentText() + " has been deleted")
         confirm_msgbox.setStandardButtons(QMessageBox.Ok)
         confirm_msgbox.exec()
-        text = self.combo2.currentIndex()
-        self.combo2.removeItem(text)
+        text = self.user_combobox.currentIndex()
+        self.user_combobox.removeItem(text)
 
 
     def quit(self):
