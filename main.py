@@ -187,8 +187,6 @@ class AddUserWindow(QtWidgets.QWidget):
         self.software_combobox = QComboBox(self)
         self.software_combobox.addItems(self.software_choices)
 
-        self.current = MenuWindow.current_software(self)
-
         layout = QtWidgets.QGridLayout()
 
         self.select_software_label = QtWidgets.QLabel(self)
