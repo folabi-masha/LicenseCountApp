@@ -12,7 +12,6 @@ db.load()
 
 class MenuWindow(QtWidgets.QWidget):
     def __init__(self):
-        self.user_window = AddUserWindow()
         db.create_database()
         db.load()
         super(MenuWindow, self).__init__()
